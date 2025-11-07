@@ -9,10 +9,13 @@ from .routers_reports import router as reports_router
 from .routers_tracking import router as tracking_router
 from .routers_catalogue import router as catalogue_router
 from .routers_taxes import router as taxes_router
+from .migrations import migrate_add_expected_delivery_date
 
 
 def create_app() -> FastAPI:
     Base.metadata.create_all(bind=engine)
+    # Run migrations
+    migrate_add_expected_delivery_date()
     app = FastAPI(title=settings.app_name)
     app.add_middleware(
         CORSMiddleware,

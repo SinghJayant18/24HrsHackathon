@@ -70,6 +70,9 @@ class Order(Base):
     total_amount: Mapped[float] = mapped_column(Float, default=0.0)
     tracking_id: Mapped[str | None] = mapped_column(String(200), default=None)
     tracking_url: Mapped[str | None] = mapped_column(String(500), default=None)
+    expected_delivery_date: Mapped[datetime | None] = mapped_column(
+        DateTime, default=None
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=datetime.utcnow
     )

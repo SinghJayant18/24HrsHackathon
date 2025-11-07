@@ -82,6 +82,7 @@ class OrderOut(BaseModel):
     total_amount: float
     tracking_id: Optional[str] = None
     tracking_url: Optional[str] = None
+    expected_delivery_date: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
     customer: CustomerOut
