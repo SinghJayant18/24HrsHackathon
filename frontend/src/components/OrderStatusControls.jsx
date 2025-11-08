@@ -48,14 +48,34 @@ function OrderStatusControls({ order, onUpdateStatus, onAssignTracking, loadingS
   };
 
   // Calculate bill summary
-  const subtotal = order.items?.reduce((sum, oi) => {
-    return sum + (oi.price_at_purchase || 0) * (oi.quantity || 0);
-  }, 0) || 0;
+  let subtotal = 0;
+  let totalDiscount = 0;
+  
+  order.items?.forEach((oi) => {
+    const priceAtPurchase = oi.price_at_purchase || 0;
+    const quantity = oi.quantity || 0;
+    const discountPct = oi.item?.discount_percent || 0;
+    
+    // Calculate original price before discount
+    let originalPrice = priceAtPurchase;
+    if (discountPct > 0) {
+      originalPrice = priceAtPurchase / (1 - discountPct / 100);
+    }
+    
+    // Calculate item totals
+    const itemSubtotal = originalPrice * quantity;
+    const itemDiscount = itemSubtotal * (discountPct / 100);
+    
+    subtotal += itemSubtotal;
+    totalDiscount += itemDiscount;
+  });
+  
+  const taxableAmount = subtotal - totalDiscount;
   const taxRate = 18; // 18% GST
-  const taxAmt = subtotal * (taxRate / 100);
+  const taxAmt = taxableAmount * (taxRate / 100);
   const sgst = taxAmt / 2;
   const cgst = taxAmt / 2;
-  const finalTotal = order.total_amount || subtotal + taxAmt;
+  const finalTotal = taxableAmount + taxAmt; // Subtotal - Discount + Tax
 
   return (
     <div className="space-y-4">
@@ -159,6 +179,12 @@ function OrderStatusControls({ order, onUpdateStatus, onAssignTracking, loadingS
             <span className="text-slate-600">Subtotal</span>
             <span className="text-slate-700">₹{subtotal.toFixed(2)}</span>
           </div>
+          {totalDiscount > 0 && (
+            <div className="flex justify-between">
+              <span className="text-slate-600">Discount</span>
+              <span className="text-emerald-600 font-medium">-₹{totalDiscount.toFixed(2)}</span>
+            </div>
+          )}
           <div className="flex justify-between">
             <span className="text-slate-600">CGST (9%)</span>
             <span className="text-slate-700">₹{cgst.toFixed(2)}</span>

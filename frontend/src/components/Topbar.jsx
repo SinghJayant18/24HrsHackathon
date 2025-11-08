@@ -1,7 +1,7 @@
 import { Menu, Bell } from "lucide-react";
 
 function Topbar() {
-  const appName = import.meta.env.VITE_APP_NAME || "Inventory Management";
+  const appName = import.meta.env.VITE_APP_NAME || "Small Scale Business Automation";
 
   return (
     <header className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 shadow-sm">

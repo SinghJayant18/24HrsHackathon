@@ -97,3 +97,26 @@ class OrderItem(Base):
 
     order: Mapped[Order] = relationship("Order", back_populates="items")
     item: Mapped[Item] = relationship("Item", back_populates="order_items")
+
+
+class Owner(Base):
+    __tablename__ = "owners"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(200))
+    email: Mapped[str] = mapped_column(String(320), unique=True, index=True)
+    password_hash: Mapped[str] = mapped_column(String(255))
+    pan_card: Mapped[str] = mapped_column(String(10), unique=True, index=True)
+    contact: Mapped[str] = mapped_column(String(50))
+    business_name: Mapped[str | None] = mapped_column(String(200), default=None)
+    business_address: Mapped[str | None] = mapped_column(Text, default=None)
+    gst_number: Mapped[str | None] = mapped_column(String(15), default=None)
+    aadhar_number: Mapped[str | None] = mapped_column(String(12), default=None)
+    bank_account: Mapped[str | None] = mapped_column(String(50), default=None)
+    ifsc_code: Mapped[str | None] = mapped_column(String(11), default=None)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+    )

@@ -87,7 +87,7 @@ def place_order(
     }
     pdf_data = generate_ebill_pdf(order_dict)
 
-    # Email to customer with e-bill PDF
+    # Email to customer with e-bill PDF for PLACED status
     customer_email = order.customer.email
     cust_subj = f"Order #{order.id} Confirmation - E-Bill Attached"
     cust_body_html = generate_order_status_email(
@@ -99,6 +99,7 @@ def place_order(
         total_amount=order.total_amount,
         items_summary=items_summary,
     )
+    print(f"📧 Sending PLACED status email to customer: {customer_email}")
     background_tasks.add_task(
         send_email_with_pdf,
         cust_subj,
@@ -218,8 +219,19 @@ def update_status(
         items_summary=items_summary,
     )
 
-    # Email to customer with e-bill PDF
-    cust_subj = f"Order #{order.id} {status_value.capitalize()} - E-Bill Attached"
+    # Email to customer for ALL status changes (PLACED, PROCESSING, DISPATCHED, DELIVERED, CANCELLED)
+    status_subjects = {
+        "placed": f"Order #{order.id} Confirmation - E-Bill Attached",
+        "processing": f"Order #{order.id} is Being Processed - E-Bill Attached",
+        "dispatched": f"Order #{order.id} Has Been Dispatched - E-Bill Attached",
+        "delivered": f"Order #{order.id} Delivered Successfully - E-Bill Attached",
+        "cancelled": f"Order #{order.id} Cancellation Notice - E-Bill Attached",
+    }
+    
+    cust_subj = status_subjects.get(status_value.lower(), f"Order #{order.id} {status_value.capitalize()} - E-Bill Attached")
+    
+    # Send email to customer for every status change
+    print(f"📧 Sending {status_value.upper()} status email to customer: {order.customer.email}")
     background_tasks.add_task(
         send_email_with_pdf,
         cust_subj,
@@ -230,7 +242,7 @@ def update_status(
     )
 
     # If order is cancelled, also notify owner
-    if status_value == "cancelled":
+    if status_value.lower() == "cancelled":
         owner_subj = f"Order #{order.id} Cancelled"
         owner_body = f"""
         <div style='font-family: Arial, sans-serif; padding: 20px;'>

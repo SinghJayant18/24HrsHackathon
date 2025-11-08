@@ -88,13 +88,27 @@ def generate_ebill_pdf(order_data: dict) -> bytes:
     c.setFont("Helvetica", 9)
     items = order_data.get("items", [])
     subtotal = 0.0
+    total_discount = 0.0
+    
     for item in items:
         item_name = item.get("item", {}).get("name", f"Item {item.get('item_id')}")
         qty = item.get("quantity", 0)
-        price = item.get("price_at_purchase", 0.0)
+        price_at_purchase = item.get("price_at_purchase", 0.0)  # Already discounted
         discount_pct = item.get("item", {}).get("discount_percent", 0.0)
-        total = price * qty
-        subtotal += total
+        
+        # Calculate original price before discount
+        if discount_pct > 0:
+            original_price = price_at_purchase / (1 - discount_pct / 100.0)
+        else:
+            original_price = price_at_purchase
+        
+        # Calculate totals
+        item_subtotal = original_price * qty
+        item_discount = item_subtotal * (discount_pct / 100.0)
+        item_total = price_at_purchase * qty  # Final after discount
+        
+        subtotal += item_subtotal
+        total_discount += item_discount
 
         if y < 3 * cm:
             c.showPage()
@@ -102,9 +116,9 @@ def generate_ebill_pdf(order_data: dict) -> bytes:
 
         c.drawString(2 * cm, y, item_name[:30])
         c.drawString(8 * cm, y, str(qty))
-        c.drawString(10 * cm, y, f"₹{price:.2f}")
+        c.drawString(10 * cm, y, f"₹{price_at_purchase:.2f}")
         c.drawString(13 * cm, y, f"{discount_pct}%")
-        c.drawString(15 * cm, y, f"₹{total:.2f}")
+        c.drawString(15 * cm, y, f"₹{item_total:.2f}")
         y -= 0.5 * cm
 
     y -= 0.3 * cm
@@ -112,20 +126,20 @@ def generate_ebill_pdf(order_data: dict) -> bytes:
     y -= 0.5 * cm
 
     # Bill Summary
-    discount_amt = subtotal * 0.0  # No additional discount on order level
+    taxable_amount = subtotal - total_discount
     tax_rate = 18.0  # Default 18% GST
-    tax_amt = (subtotal - discount_amt) * (tax_rate / 100.0)
+    tax_amt = taxable_amount * (tax_rate / 100.0)
     sgst = tax_amt / 2
     cgst = tax_amt / 2
-    final_total = order_data.get("total_amount", subtotal + tax_amt)
+    final_total = taxable_amount + tax_amt  # Subtotal - Discount + Tax
 
     c.setFont("Helvetica", 10)
     c.drawString(12 * cm, y, "Subtotal:")
     c.drawString(15 * cm, y, f"₹{subtotal:.2f}")
     y -= 0.5 * cm
-    if discount_amt > 0:
+    if total_discount > 0:
         c.drawString(12 * cm, y, "Discount:")
-        c.drawString(15 * cm, y, f"-₹{discount_amt:.2f}")
+        c.drawString(15 * cm, y, f"-₹{total_discount:.2f}")
         y -= 0.5 * cm
     c.drawString(12 * cm, y, "CGST (9%):")
     c.drawString(15 * cm, y, f"₹{cgst:.2f}")

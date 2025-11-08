@@ -106,3 +106,44 @@ class TaxSummary(BaseModel):
     tax_rate_percent: float
     total_tax_due: float
     period: str
+
+
+class OwnerRegister(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    pan_card: str
+    contact: str
+    business_name: Optional[str] = None
+    business_address: Optional[str] = None
+    gst_number: Optional[str] = None
+    aadhar_number: Optional[str] = None
+    bank_account: Optional[str] = None
+    ifsc_code: Optional[str] = None
+
+
+class OwnerLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class OwnerOut(BaseModel):
+    id: int
+    name: str
+    email: str
+    pan_card: str
+    contact: str
+    business_name: Optional[str] = None
+    business_address: Optional[str] = None
+    gst_number: Optional[str] = None
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    owner: OwnerOut

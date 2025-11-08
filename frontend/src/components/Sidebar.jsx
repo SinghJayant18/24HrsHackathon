@@ -22,7 +22,7 @@ function Sidebar() {
     <aside className="hidden w-64 flex-col border-r border-slate-200 bg-white p-4 shadow-sm lg:flex">
       <div className="mb-10 flex items-center gap-2 text-xl font-semibold text-primary">
         <Package2 className="h-6 w-6" />
-        <span>24Hrs Inventory</span>
+        <span>Small Scale Business Automation</span>
       </div>
       <nav className="flex flex-1 flex-col gap-2">
         {navigation.map((item) => {

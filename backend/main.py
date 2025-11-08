@@ -9,6 +9,7 @@ from .routers_reports import router as reports_router
 from .routers_tracking import router as tracking_router
 from .routers_catalogue import router as catalogue_router
 from .routers_taxes import router as taxes_router
+from .routers_auth import router as auth_router
 from .migrations import migrate_add_expected_delivery_date
 
 
@@ -25,6 +26,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    app.include_router(auth_router)
     app.include_router(items_router)
     app.include_router(orders_router)
     app.include_router(reports_router)

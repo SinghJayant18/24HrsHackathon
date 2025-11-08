@@ -104,7 +104,7 @@ Order Details:
 Thank you for your business!
 
 Best regards,
-24Hrs Inventory Team
+Small Scale Business Automation Team
 """
 
     return content
