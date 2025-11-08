@@ -1,5 +1,10 @@
 import api from "./client";
 
+export const fetchQuarterlySummary = async () => {
+  const { data } = await api.get("/taxes/quarterly-summary");
+  return data;
+};
+
 export const fetchMonthlySummary = async ({ month, year }) => {
   const params = new URLSearchParams();
   if (month) params.append("month", month);
@@ -8,12 +13,13 @@ export const fetchMonthlySummary = async ({ month, year }) => {
   return data;
 };
 
-export const sendTaxAlert = async ({ to_email, month, year }) => {
-  const params = new URLSearchParams();
-  if (to_email) params.append("to_email", to_email);
-  if (month) params.append("month", month);
-  if (year) params.append("year", year);
-  const { data } = await api.post(`/taxes/send-monthly-alert?${params.toString()}`);
+export const sendTaxAlert = async () => {
+  const { data } = await api.post("/taxes/send-tax-alert");
+  return data;
+};
+
+export const checkTaxAlerts = async () => {
+  const { data } = await api.get("/taxes/check-alerts");
   return data;
 };
 

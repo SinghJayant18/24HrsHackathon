@@ -22,8 +22,8 @@ class Settings(BaseSettings):
     # JWT Secret (change in production!)
     jwt_secret_key: str = "your-secret-key-change-in-production-2024"
 
-    # Tax config
-    total_tax_rate_percent: float = 30.0
+    # Tax config (10% fixed rate for small scale businesses)
+    total_tax_rate_percent: float = 10.0
 
     # CORS
     cors_origins: list[str] = ["*"]
